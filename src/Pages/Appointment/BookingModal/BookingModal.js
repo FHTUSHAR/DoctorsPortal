@@ -1,8 +1,9 @@
 import React from 'react';
 import { format } from 'date-fns';
-const BookingModal = ({ treatment, selectedDate }) => {
-    const handleBooking = (event) => {
+const BookingModal = ({ treatment, selectedDate, setTreatment }) => {
+    const date = format(selectedDate, 'PP')
 
+    const handleBooking = (event) => {
         event.preventDefault()
         const name = event.target.name.value
         const email = event.target.email.value
@@ -10,6 +11,16 @@ const BookingModal = ({ treatment, selectedDate }) => {
         const slot = event.target.slot.value
         console.log(name, email, slot, phone)
         event.target.reset()
+        const appointmentBooking = {
+            selectedDate: date,
+            treatment: treatment.name,
+            patient: name,
+            email,
+            phone,
+            slot
+        }
+
+        setTreatment(null)
     }
     return (
         <>

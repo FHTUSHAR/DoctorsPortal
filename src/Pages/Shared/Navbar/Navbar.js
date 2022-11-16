@@ -8,7 +8,7 @@ const Navbar = () => {
         <li><Link to={'/appointment'}>Appointment</Link></li>
         <li><Link>Reviews</Link></li>
         <li><Link>Contact Us</Link></li>
-        <li><Link>Login</Link></li>
+        <li><Link to={'/login'}>Login</Link></li>
     </React.Fragment>
     return (
         <div className="navbar bg-base-100 h-16">
