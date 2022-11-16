@@ -7,6 +7,8 @@ import { AuthContext } from '../../context/AuthProvider';
 const Login = () => {
     const { createGoogleUser, signInUser } = useContext(AuthContext)
     const { register, handleSubmit, formState: { errors } } = useForm();
+    const [error, setError] = useState('')
+    console.log(error)
     const navigate = useNavigate()
     const handleLogin = data => {
         const { email, fpassword } = data;
@@ -16,10 +18,11 @@ const Login = () => {
                 const user = result.user;
                 console.log(user)
                 navigate('/')
+                setError('')
             })
             .catch(e => {
                 console.error(e)
-                navigate('/login')
+                setError(e.message)
             })
     }
     const handleGoogleBtn = () => {
@@ -31,7 +34,7 @@ const Login = () => {
             })
             .catch(e => {
                 console.error(e)
-                navigate('/login')
+                setError(e.message)
             })
     }
     return (
@@ -68,6 +71,7 @@ const Login = () => {
 
                 </form>
                 <button onClick={handleGoogleBtn} className=' btn btn-outline text-center  border-dark w-full max-w-xs  p-2 rounded-lg text-dark'>Continue with GOOGLE</button>
+                <p>{error}</p>
             </div>
         </div>
     );

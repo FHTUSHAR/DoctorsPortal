@@ -1,23 +1,36 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthProvider';
 const Register = () => {
-    const { createUser, createGoogleUser } = useContext(AuthContext)
+    const { createUser, createGoogleUser, userProfile } = useContext(AuthContext)
     const { register, handleSubmit, formState: { errors } } = useForm();
+    const [error, setError] = useState('')
     const navigate = useNavigate()
     const handleRegister = data => {
-        const { email, fpassword } = data;
+        const { email, fpassword, name } = data;
         console.log(data)
         createUser(email, fpassword)
             .then(result => {
                 const user = result.user;
                 console.log(user)
                 navigate('/')
+                setError('')
             })
             .catch(e => {
                 console.error(e)
-                navigate('/register')
+                setError(e.message)
+            })
+        const profile = {
+            displayName: name,
+        }
+        userProfile(profile)
+            .then(result => {
+                setError('')
+            })
+            .catch(e => {
+                console.error(e)
+                setError(e.message)
             })
     }
     const handleGoogleBtn = () => {
@@ -26,10 +39,11 @@ const Register = () => {
                 const user = result.user;
                 console.log(user)
                 navigate('/')
+                setError('')
             })
             .catch(e => {
                 console.error(e)
-                navigate('/register')
+                setError(e.message)
             })
     }
     return (
