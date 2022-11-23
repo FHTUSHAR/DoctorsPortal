@@ -2,11 +2,17 @@ import React, { useContext, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthProvider';
+import useToken from '../../hooks/useToken';
 const Register = () => {
     const { createUser, createGoogleUser, userProfile } = useContext(AuthContext)
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [error, setError] = useState('')
+    const [createdUserEmail, setCreatedUserEmail] = useState('')
+    const [token] = useToken(createdUserEmail)
     const navigate = useNavigate()
+    if (token) {
+        navigate('/')
+    }
     const handleRegister = data => {
         const { email, fpassword, name } = data;
         console.log(data)
@@ -14,13 +20,18 @@ const Register = () => {
             .then(result => {
                 const user = result.user;
                 console.log(user)
-                navigate('/')
+
+                updateName(name)
+                saveUserToDatabase(name, email)
                 setError('')
             })
             .catch(e => {
                 console.error(e)
                 setError(e.message)
             })
+
+    }
+    const updateName = (name) => {
         const profile = {
             displayName: name,
         }
@@ -33,6 +44,34 @@ const Register = () => {
                 setError(e.message)
             })
     }
+    const saveUserToDatabase = (name, email) => {
+        const savedUser = { name, email }
+        fetch('https://doctors-portal-server-lime-nu.vercel.app/users', {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(savedUser)
+        })
+            .then(res => res.json())
+            .then(data => {
+                setCreatedUserEmail(email)
+
+
+            })
+            .catch(e => console.error(e))
+    }
+    // const getUserToken = email => {
+    //     fetch(`https://doctors-portal-server-lime-nu.vercel.app/jwt?email=${email}`)
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             if (data.accessToken) {
+    //                 navigate('/')
+    //                 localStorage.setItem('accessToken', data.accessToken)
+    //             }
+    //         })
+    // }
+
     const handleGoogleBtn = () => {
         createGoogleUser()
             .then(result => {
@@ -85,6 +124,7 @@ const Register = () => {
                     <h2 className='text-center font-semibold my-3'>OR</h2>
                 </form>
                 <button onClick={handleGoogleBtn} className=' btn btn-outline text-center  border-dark w-full max-w-xs  p-2 rounded-lg text-dark'>Continue with GOOGLE</button>
+                <p>{error}</p>
             </div>
         </div>
     );

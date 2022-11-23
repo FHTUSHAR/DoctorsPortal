@@ -1,15 +1,24 @@
 import React, { useContext } from 'react';
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthProvider';
+import useToken from '../../hooks/useToken';
 
 const Login = () => {
     const { createGoogleUser, signInUser } = useContext(AuthContext)
+    let location = useLocation();
+    const [loginUserEmail, setLoginUserEmail] = useState('')
+    const [token] = useToken(loginUserEmail)
+
+    let from = location.state?.from?.pathname || "/";
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [error, setError] = useState('')
-    console.log(error)
     const navigate = useNavigate()
+
+    if (token) {
+        navigate(from, { replace: true })
+    }
     const handleLogin = data => {
         const { email, fpassword } = data;
         console.log(data)
@@ -17,7 +26,7 @@ const Login = () => {
             .then(result => {
                 const user = result.user;
                 console.log(user)
-                navigate('/')
+                setLoginUserEmail(email)
                 setError('')
             })
             .catch(e => {
